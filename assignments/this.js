@@ -1,7 +1,8 @@
 /* The for principles of "this";
 * in your own words. explain the four principle for the "this" keyword below.
 *
-* 1. 
+* 1. Window Binding. By default. this is bound to the window which is the browser object. 
+    
 * 2. 
 * 3. 
 * 4. 

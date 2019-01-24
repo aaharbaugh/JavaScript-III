@@ -8,13 +8,20 @@
   Each constructor function has unique properties and methods that are defined in their block comments below:
 */
   
-const GameObject = ()
 /*
   === GameObject ===
   * createdAt
   * dimensions (These represent the character's size in the video game)
   * destroy() // prototype method -> returns the string: 'Object was removed from the game.'
 */
+
+function GameObject(attributes){
+  this.createdAt = attributes.createdAt;
+  this.dimensions = attributes.dimensions;
+  this.destroy = function () {
+    return `${this.name} was removed from the game`
+  }
+}
 
 /*
   === CharacterStats ===
@@ -23,6 +30,17 @@ const GameObject = ()
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
+
+function CharacterStats (attributes){
+  GameObject.call(this, attributes)
+  this.healthPoints = attributes.healthPoints
+  this.name = attributes.name
+  this.takeDamage = function () {
+    return `${this.name} took damage.`
+  }
+}
+
+CharacterStats.prototype = Object.create(GameObject.prototype)
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -33,7 +51,20 @@ const GameObject = ()
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
- 
+
+function Humanoid (attributes){
+  CharacterStats.call(this, attributes)
+  this.team = attributes.team
+  this.weapons = attributes.weapons
+  this.language = attributes.language
+
+}
+
+Humanoid.prototype = Object.create(CharacterStats.prototype)
+
+Humanoid.prototype.greet = function () {
+  return `${this.name} offers a greeting in ${this.language}`;
+};
 /*
   * Inheritance chain: GameObject -> CharacterStats -> Humanoid
   * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
@@ -42,7 +73,7 @@ const GameObject = ()
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-/*
+
   const mage = new Humanoid({
     createdAt: new Date(),
     dimensions: {
@@ -103,9 +134,79 @@ const GameObject = ()
   console.log(archer.greet()); // Lilith offers a greeting in Elvish.
   console.log(mage.takeDamage()); // Bruce took damage.
   console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-*/
+
 
   // Stretch task: 
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
+
+  function Villain (attributes){
+    Humanoid.call(this, attributes)
+  }
+  
+  Villain.prototype = Object.create(Humanoid.prototype)
+  
+  Villain.prototype.attack = function (target) {
+    target.healthPoints -= 7
+    console.log(`${this.name} attacks ${target.name} for 7 HP`)
+    
+    if(target.healthPoints <= 0){
+      return target.destroy()
+    }
+    return `${target.name} is now at ${target.healthPoints} health`;
+  };  
+
+  const evilMan = new Villain({
+    createdAt: new Date(),
+    dimensions: {
+      length: 1,
+      width: 2,
+      height: 4,
+    },
+    healthPoints: 10,
+    name: 'Blake',
+    team: 'Bad Boy Street',
+    weapons: [
+      'Poison',
+      'Dagger',
+    ],
+    language: 'Gibberish',
+  });
+
+  function Hero (attributes){
+    Humanoid.call(this, attributes)
+  }
+  
+  Hero.prototype = Object.create(Hero.prototype)
+  
+  Hero.prototype.heal = function (target) {
+    target.healthPoints += 15
+    console.log(`${target.name} is now ${target.healthPoints}`)
+    return `${this.name} heals ${target.name} for 15 HP`;
+  };  
+
+  const goodMan = new Hero({
+    createdAt: new Date(),
+    dimensions: {
+      length: 1,
+      width: 2,
+      height: 4,
+    },
+    healthPoints: 10,
+    name: 'Priest',
+    team: 'Good Boy Street',
+    weapons: [
+      'Staff',
+      'Cross',
+    ],
+    language: 'Latin',
+  });
+
   // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
+
+  evilMan.attack(archer)
+  goodMan.heal(archer)
+  evilMan.attack(archer)
+  evilMan.attack(archer)
+  evilMan.attack(archer)
+  //"Lilith was removed from the game"
